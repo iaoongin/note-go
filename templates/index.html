@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Temporary Text Input</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<style>
+		body{
+			font-family: Arial, sans-serif;
+			/* margin: 0; */
+			padding: 0;
+		}
+		#textInput{
+			width: 95%;
+			height: 200px;
+			margin: 20px auto;
+			padding: 10px;
+			/* border: 1px solid #ccc; */
+			border-radius: 5px;
+			resize: none;
+		}
+	</style>
+</head>
+<body>
+	<!-- <h1>Temporary Text Input</h1> -->
+	<!-- <p>Your temporary address is: <span id="randomAddress">{{ .RandomAddress }}</span></p> -->
+	<div>
+		<button id="saveButton">Save</button>
+	</div>
+	<div>
+		<textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
+	</div>
+
+	<script>
+		$(document).ready(function() {
+			$('#saveButton').on('click', function() {
+				var text = $('#textInput').val();
+				$.post('/save', { text: text }, function(data) {
+					console.log(data.message);
+					window.location.href = '/' + data.randomAddress;
+				});
+			});
+		});
+	</script>
+</body>
+</html>

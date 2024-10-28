@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: note-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: note-go
+  template:
+    metadata:
+      labels:
+        app: note-go
+    spec:
+      containers:
+      - name: note-go
+        image: ghcr.io/iaoongin/note-go:main
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      #   volumeMounts:
+      #   - mountPath: /app/data
+      #     name: note-go-data-volume
+      # volumes:
+      # - name: note-go-data-volume
+      #   hostPath:
+      #     path: /data/note-go
+      #     type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: note-go
+spec:
+  type: ClusterIP
+  ports:
+    - port: 30003
+      targetPort: 8080
+  selector:
+    app: note-go
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer # I'm using ClusterIssuer here
+metadata:
+  name: ${CERT_MANAGER} # 证书提供者
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: ${EMAIL} # 邮箱
+    privateKeySecretRef:
+      name: ${CERT_MANAGER} # 证书提供者
+    solvers:
+    - http01:
+        ingress:
+          class: traefik
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: note-go
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: ${CERT_MANAGER} # 证书提供者
+
+spec:
+  tls:
+  - hosts:
+    - ${DOMAIN}  # 请替换为你的域名
+    secretName: ${CERT_MANAGER} # 证书提供者
+  rules:
+  - host: ${DOMAIN}  # 替换为你的域名
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: note-go
+            port:
+              number: 30003

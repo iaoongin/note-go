@@ -34,9 +34,9 @@
 		$(document).ready(function() {
 			$('#saveButton').on('click', function() {
 				var text = $('#textInput').val();
-				$.post('/save', { text: text }, function(data) {
-					console.log(data.message);
-					window.location.href = '/' + data.randomAddress;
+				$.post('/save' + '/{{.RandomAddress}}', { text: text }, function(data) {
+					// console.log(data.message);
+					// window.location.reload();
 				});
 			});
 		});

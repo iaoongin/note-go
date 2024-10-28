@@ -3,14 +3,29 @@
 <head>
 	<title>Temporary Text Input</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<!-- 适配移动端 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style>
 		body{
 			font-family: Arial, sans-serif;
 			/* margin: 0; */
 			padding: 0;
 		}
+
+		#saveButton{
+			width: calc(100%);
+			background-color: #4CAF50;
+			color: white;
+			padding: 10px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			display: block;
+
+		}
+
 		#textInput{
-			width: 95%;
+			width: calc(100% - 20px);
 			height: 200px;
 			margin: 20px auto;
 			padding: 10px;
@@ -23,11 +38,9 @@
 <body>
 	<!-- <h1>Temporary Text Input</h1> -->
 	<!-- <p>Your temporary address is: <span id="randomAddress">{{ .RandomAddress }}</span></p> -->
-	<div>
-		<button id="saveButton">Save</button>
-	</div>
-	<div>
-		<textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
+	 <div>
+		 <textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
+		 <button id="saveButton">Save</button>
 	</div>
 
 	<script>

@@ -4,7 +4,6 @@ FROM alpine
 WORKDIR /app
 
 COPY ./build/note-go .
-COPY ./data ./data
 COPY ./templates ./templates
 
 RUN chmod +x ./note-go

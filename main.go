@@ -16,9 +16,6 @@ func main() {
 	// 加载HTML模板
 	r.LoadHTMLGlob("templates/*")
 
-	// 用于存储文本数据的map
-	// textDataMap := make(map[string]*TextData)
-
 	// 使用db
 	// 创建 LevelDBWrapper 实例
 	dbWrapper, err := NewLevelDBWrapper("data/notes.db")
@@ -28,11 +25,9 @@ func main() {
 	defer dbWrapper.Close()
 
 	r.GET("/", func(c *gin.Context) {
+
 		// 生成一个随机地址并重定向
 		randomAddress := generateRandomAddress()
-		// textDataMap[randomAddress] = &TextData{
-		// 	Text: "Hello, World!",
-		// }
 
 		// 插入数据
 		if err := dbWrapper.Put(randomAddress, TextData{
@@ -63,12 +58,8 @@ func main() {
 		address := c.Param("address")
 		// 获取提交的文本内容
 		text := c.PostForm("text")
+
 		// 保存文本内容
-
-		// textDataMap[address] = &TextData{
-		// 	Text: text,
-		// }
-
 		// 插入数据
 		if err := dbWrapper.Put(address, &TextData{
 			Text: text,

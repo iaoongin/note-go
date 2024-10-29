@@ -18,14 +18,14 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
-      #   volumeMounts:
-      #   - mountPath: /app/data
-      #     name: note-go-data-volume
-      # volumes:
-      # - name: note-go-data-volume
-      #   hostPath:
-      #     path: /data/note-go
-      #     type: DirectoryOrCreate
+        volumeMounts:
+        - mountPath: /app/data
+          name: note-go-data-volume
+      volumes:
+      - name: note-go-data-volume
+        hostPath:
+          path: /data/note-go
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

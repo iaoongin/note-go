@@ -48,7 +48,7 @@ func main() {
 				"Text":          textData.Text,
 			})
 		} else {
-			log.Fatal(err)
+			log.Println(err)
 			// 如果没有找到对应的文本数据,则显示404页面
 			c.HTML(http.StatusNotFound, "404.html", nil)
 		}

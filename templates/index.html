@@ -24,9 +24,8 @@
 			resize: none;
 		}
 
-		#saveButton{
+		button{
 			width: calc(100%);
-			background-color: #4CAF50;
 			color: white;
 			padding: 10px;
 			border: none;
@@ -36,18 +35,29 @@
 			margin: 0 auto 20px auto;
 		}
 
+    #saveButton{
+      background-color: #4CAF50;
+    }
+
+    #copyButton{
+      background-color: #2196F3;
+    }
+
+    #resetButton{
+      background-color: #f44336;
+    }
+
 		#qrcode img {
 			margin: 0 auto;
-
 		}
 	</style>
 </head>
 <body>
-	<!-- <h1>Temporary Text Input</h1> -->
-	<!-- <p>Your temporary address is: <span id="randomAddress">{{ .RandomAddress }}</span></p> -->
 	 <div>
 		 <textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
 		 <button id="saveButton">Save</button>
+		 <button id="copyButton">Copy</button>
+		 <!-- <button id="resetButton">Reset</button> -->
 		 <div id="qrcode"></div>
 	</div>
 
@@ -61,6 +71,19 @@
 					alert('Saved')
 				});
 			});
+
+
+      $('#copyButton').on('click', function() {
+          var text = $('#textInput').val();
+          // console.log(text);
+          // 复制到剪贴板
+          navigator.clipboard.writeText(text).then(() => {
+              console.log("文本已复制到剪切板");
+          }).catch(err => {
+              console.error("复制失败:", err);
+          });
+          alert('Copied')
+      });
 		});
 	</script>
 	 <script>

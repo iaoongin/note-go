@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+          
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Note Go - Temporary Note</title>
@@ -8,85 +10,646 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 	<style>
-		body{
-			font-family: Arial, sans-serif;
-			/* margin: 0; */
+		/* 修改基础样式 */
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #f5f5f5;
+		}
+
+		#textInput {
+			width: 100%;
+			height: 400px;
+			margin: 0 0 15px 0;
+			padding: 20px;  /* 增加内边距 */
+			border-radius: 8px;
+			resize: none;
+			border: 1px solid #e0e0e0;  /* 更柔和的边框颜色 */
+			outline: none;
+			background-color: #ffffff;
+			box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);  /* 更微妙的内阴影 */
+			font-size: 16px;
+			line-height: 1.6;
+			color: #2c3e50;  /* 更舒适的文字颜色 */
+		}
+
+		/* 优化按钮样式 */
+		button {
+			width: 100%;
+			color: white;
+			padding: 12px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			display: block;
+			margin: 0 0 12px 0;
+			font-size: 15px;
+			font-weight: 500;  /* 添加字重 */
+			transition: all 0.2s ease;  /* 平滑过渡效果 */
+		}
+
+		/* 调整按钮颜色为更协调的色调 */
+		#saveButton { background-color: #4CAF50; }
+		#copyButton { background-color: #3498db; }
+		#resetButton { background-color: #e74c3c; }
+		#shareButton { background-color: #9b59b6; }
+
+		button:hover {
+			opacity: 0.9;
+			transform: translateY(-1px);  /* 添加轻微的悬浮效果 */
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* 悬浮时添加阴影 */
+		}
+
+		.container {
+			padding: 20px;
+			max-width: 800px;
+			margin: 20px auto;
+			background-color: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		}
+
+		#qrcode{
+			width: 128px;
+			height: 128px;
+			margin: 20px auto;
+		}
+
+		#saveButton{
+			background-color: #4CAF50;
+		}
+
+		#copyButton{
+			background-color: #2196F3;
+		}
+
+		#resetButton{
+			background-color: #f44336;
+		}
+
+		#shareButton {
+			background-color: #9C27B0;
+		}
+		
+		#previewModal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0,0,0,0.7);
+			z-index: 1000;
+			justify-content: center;
+			align-items: center;
+			overflow: hidden;
+		}
+		
+		#previewImage {
+			max-width: 90%;
+			max-height: 90vh;
+			object-fit: contain;
+			transform-origin: center center;
+			transition: transform 0.1s ease;
+		}
+		
+		#previewContent {
+			position: relative;
+			background: transparent;
 			padding: 0;
 		}
-
-		#textInput{
-			width: calc(100% - 20px);
-			height: 200px;
-			margin: 20px auto;
-			padding: 10px;
-			/* border: 1px solid #ccc; */
-			border-radius: 5px;
-			resize: none;
+		
+		.closeModal {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			cursor: pointer;
+			font-size: 24px;
 		}
-
-		button{
-			width: calc(100%);
+		
+		#downloadBtn {
+			background-color: #FF9800;
 			color: white;
-			padding: 10px;
+			padding: 10px 20px;
 			border: none;
 			border-radius: 5px;
 			cursor: pointer;
-			display: block;
-			margin: 0 auto 20px auto;
 		}
 
-    #saveButton{
-      background-color: #4CAF50;
-    }
+		/* 修改二维码容器样式 */
+		.qr-section {
+			margin-top: 30px;
+			padding-top: 20px;
+			border-top: 1px solid #eee;
+			text-align: center;
+		}
 
-    #copyButton{
-      background-color: #2196F3;
-    }
+		.qr-title {
+			color: #666;
+			font-size: 14px;
+			margin-bottom: 15px;
+			font-weight: 500;
+		}
 
-    #resetButton{
-      background-color: #f44336;
-    }
+		#qrcode {
+			width: 128px;
+			height: 128px;
+			margin: 0 auto;
+		}
 
-    #qrcode{
-      width: 128px;
-      height: 128px;
-      margin: 0 auto;
-    }
+		/* 修改移动端样式 */
+		@media screen and (max-width: 768px) {
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;  /* 确保最小高度为视口高度 */
+			}
 
+			.container {
+				margin: 0;
+				padding: 0;
+				border-radius: 0;
+				box-shadow: none;
+				background-color: transparent;
+				min-height: 100vh;  /* 容器最小高度为视口高度 */
+				display: flex;  /* 添加flex布局 */
+				flex-direction: column;  /* 垂直方向排列 */
+			}
+
+			.editor-section {
+				padding: 20px;
+				box-sizing: border-box;
+				width: 100%;
+				flex: 1;  /* 让编辑区自动填充剩余空间 */
+				display: flex;  /* 添加flex布局 */
+				flex-direction: column;  /* 垂直方向排列 */
+			}
+
+			#textInput {
+				height: auto;  /* 移除固定高度 */
+				min-height: 200px;  /* 设置最小高度 */
+				flex: 1;  /* 让文本框自动填充剩余空间 */
+				font-size: 16px;
+				padding: 15px;
+				margin: 0 0 15px 0;
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				background-color: #ffffff;
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			button {
+				padding: 12px;
+				margin: 0 0 10px 0;
+				font-size: 14px;
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			button:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		/* 针对超小屏幕的优化 */
+		@media screen and (max-width: 320px) {
+			.container {
+				padding: 10px;
+			}
+
+			#textInput {
+				padding: 12px;
+			}
+
+			button {
+				padding: 10px;
+				font-size: 13px;
+			}
+		}
+
+		/* 修改 PC 端双栏布局相关样式 */
+		@media screen and (min-width: 1024px) {
+			body {
+				min-height: 100vh;
+				padding: 20px;
+				margin: 0;
+				box-sizing: border-box;
+				background-color: #f5f5f5;
+				overflow: hidden;
+			}
+
+			.container {
+				display: flex;
+				max-width: 1600px;
+				gap: 30px;
+				height: calc(100vh - 40px);
+				margin: 0 auto;
+				padding: 0;  /* 移除容器内边距 */
+				background-color: transparent;
+				box-shadow: none;
+				border-radius: 0;
+				overflow: hidden;
+			}
+
+			.editor-section {
+				flex: 1;
+				width: 50%;
+				display: flex;
+				flex-direction: column;
+				background: #ffffff;
+				padding: 25px;
+				border-radius: 12px;
+				box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+				max-height: calc(100vh - 40px);  /* 调整高度 */
+				overflow: hidden;
+			}
+
+			#textInput {
+				flex: 1;
+				width: 100%;
+				height: auto;
+				min-height: 0;
+				margin-bottom: 15px;
+				overflow-y: auto;
+				box-sizing: border-box;
+			}
+
+			.preview-section {
+				width: 50%;
+				max-height: calc(100vh - 40px);
+				padding: 0;  /* 移除内边距 */
+				background-color: transparent;
+				box-shadow: none;
+				border-radius: 0;
+				overflow-y: auto;
+				overflow-x: hidden;
+				display: block;
+			}
+
+			#previewNoteImage {
+				width: 100%;
+				height: auto;
+				display: block;
+				margin: 0;
+			}
+
+			/* 美化滚动条 */
+			#textInput::-webkit-scrollbar,
+			.preview-section::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			#textInput::-webkit-scrollbar-track,
+			.preview-section::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 4px;
+			}
+
+			#textInput::-webkit-scrollbar-thumb,
+			.preview-section::-webkit-scrollbar-thumb {
+				background: #d1d1d1;
+				border-radius: 4px;
+				border: 2px solid #f1f1f1;
+			}
+
+			#textInput::-webkit-scrollbar-thumb:hover,
+			.preview-section::-webkit-scrollbar-thumb:hover {
+				background: #c1c1c1;
+			}
+
+			/* 按组样式优化 */
+			.editor-section button {
+				margin-bottom: 10px;
+			}
+
+			.editor-section button:last-child {
+				margin-bottom: 0;
+			}
+		}
 	</style>
 </head>
 <body>
-	 <div>
-		 <textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
-		 <button id="saveButton">Save</button>
-		 <button id="copyButton">Copy</button>
-		 <!-- <button id="resetButton">Reset</button> -->
-		 <div id="qrcode"></div>
+	<div class="container">
+		<div class="editor-section">
+			<textarea id="textInput" rows="5" placeholder="Enter your text here">{{ .Text }}</textarea>
+			<button id="saveButton">Save</button>
+			<button id="copyButton">Copy</button>
+			<button id="shareButton">Share as Image</button>
+		</div>
+		
+		<div class="preview-section" id="pcPreview">
+			<img id="previewNoteImage" class="preview-note">
+		</div>
+	</div>
+
+	<div id="previewModal">
+	    <img id="previewImage">
 	</div>
 
 	<script>
 		$(document).ready(function() {
-			$('#saveButton').on('click', function() {
-				var text = $('#textInput').val();
-				$.post('/save' + '/{{.RandomAddress}}', { text: text }, function(data) {
-					// console.log(data.message);
-					// window.location.reload();
-					alert('Saved')
+			// 常量配置
+			const CONFIG = {
+				CANVAS: {
+					WIDTH: 1000,
+					MIN_HEIGHT: 700,
+					PADDING: {
+						HORIZONTAL: 40,
+						VERTICAL: 40
+					},
+					BORDER_RADIUS: 20
+				},
+				TEXT: {
+					FONT: '24px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif',
+					LINE_HEIGHT: 45,
+					START_Y: 100,
+					OFFSET_Y: -6,
+					COLOR: '#2c3e50'
+				},
+				COLORS: {
+					NOTE_BG: '#fff7d1',
+					LINE: '#e6d5a7'
+				},
+				PREVIEW: {
+					MIN_SCALE: 0.5,
+					MAX_SCALE: 3,
+					SCALE_STEP: 0.1
+				},
+				BREAKPOINTS: {
+					PC: 1024
+				}
+			};
+
+			// 预览状态管理
+			const PreviewState = {
+				scale: 1,
+				reset() {
+					this.scale = 1;
+					$('#previewImage').css('transform', 'scale(1)');
+					$('#previewModal').fadeOut();
+				}
+			};
+
+			// 工具函数
+			const Utils = {
+				// 绘制圆角矩形
+				drawRoundRect(ctx, x, y, w, h, radius) {
+					ctx.beginPath();
+					ctx.moveTo(x + radius, y);
+					ctx.arcTo(x + w, y, x + w, y + h, radius);
+					ctx.arcTo(x + w, y + h, x, y + h, radius);
+					ctx.arcTo(x, y + h, x, y, radius);
+					ctx.arcTo(x, y, x + w, y, radius);
+					ctx.closePath();
+				},
+
+				// 文本分行处理
+				splitTextIntoLines(ctx, text, maxWidth) {
+					const textLines = text.split('\n');
+					let lines = [];
+					
+					textLines.forEach(textLine => {
+						if (textLine.trim() === '') {
+							lines.push('');
+							return;
+						}
+						
+						const chars = textLine.split('');
+						let line = '';
+						
+						for (let i = 0; i < chars.length; i++) {
+							let testLine = line + chars[i];
+							let metrics = ctx.measureText(testLine);
+							
+							if (metrics.width > maxWidth && i > 0) {
+								lines.push(line);
+								line = chars[i];
+							} else {
+								line = testLine;
+							}
+						}
+						lines.push(line);
+					});
+					
+					return lines;
+				},
+
+				// 判断是否为 PC 端
+				isPC() {
+					return window.innerWidth >= CONFIG.BREAKPOINTS.PC;
+				}
+			};
+
+			// 事件处理
+			const EventHandlers = {
+				// 保存按钮点击事件
+				onSave() {
+					const text = $('#textInput').val();
+					$.post('/save/{{.RandomAddress}}', { text: text }, function() {
+						alert('Saved');
+					});
+				},
+
+				// 复制按钮点击事件
+				onCopy() {
+					const text = $('#textInput').val();
+					navigator.clipboard.writeText(text)
+						.then(() => alert('Copied'))
+						.catch(err => console.error("复制失败:", err));
+				},
+
+				// 分享按钮点击事件
+				onShare() {
+					if (!Utils.isPC()) {
+						generateNoteImage();
+						$('#previewModal').css('display', 'flex').fadeIn();
+					}
+				},
+
+				// 预览缩放事件
+				onPreviewWheel(e) {
+					e.preventDefault();
+					if (e.originalEvent.deltaY < 0) {
+						PreviewState.scale = Math.min(PreviewState.scale + CONFIG.PREVIEW.SCALE_STEP, CONFIG.PREVIEW.MAX_SCALE);
+					} else {
+						PreviewState.scale = Math.max(PreviewState.scale - CONFIG.PREVIEW.SCALE_STEP, CONFIG.PREVIEW.MIN_SCALE);
+					}
+					$('#previewImage').css('transform', `scale(${PreviewState.scale})`);
+				}
+			};
+
+			// 绘制便签图片
+			function generateNoteImage() {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				const text = $('#textInput').val();
+				
+				// 设置画布尺寸
+				const maxWidth = CONFIG.CANVAS.WIDTH - 120;
+				ctx.font = CONFIG.TEXT.FONT;
+				const lines = Utils.splitTextIntoLines(ctx, text, maxWidth);
+				
+				// 计算画布高度
+				const textContentHeight = CONFIG.TEXT.START_Y + (lines.length * CONFIG.TEXT.LINE_HEIGHT);
+				const qrCodeSpace = 200;
+				const height = Math.max(
+					CONFIG.CANVAS.MIN_HEIGHT, 
+					textContentHeight + qrCodeSpace + CONFIG.CANVAS.PADDING.VERTICAL * 2
+				);
+				
+				canvas.width = CONFIG.CANVAS.WIDTH;
+				canvas.height = height;
+
+				// 重新设置上下文属性
+				ctx.font = CONFIG.TEXT.FONT;
+				
+				// 绘制背景
+				ctx.clearRect(0, 0, CONFIG.CANVAS.WIDTH, height);
+				ctx.save();
+				Utils.drawRoundRect(ctx, 0, 0, CONFIG.CANVAS.WIDTH, height, CONFIG.CANVAS.BORDER_RADIUS);
+				ctx.clip();
+				
+				// 绘制便签背景
+				ctx.fillStyle = CONFIG.COLORS.NOTE_BG;
+				ctx.fillRect(0, 0, CONFIG.CANVAS.WIDTH, height);
+				
+				// 添加阴影效果
+				ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+				ctx.shadowBlur = 15;
+				ctx.shadowOffsetX = 5;
+				ctx.shadowOffsetY = 5;
+				
+				// 绘制装饰线条
+				ctx.strokeStyle = CONFIG.COLORS.LINE;
+				ctx.lineWidth = 2;
+				
+				// 绘制横线
+				for(let y = CONFIG.TEXT.START_Y; y < height - CONFIG.CANVAS.PADDING.VERTICAL; y += CONFIG.TEXT.LINE_HEIGHT) {
+					// 计算二维码区域的范围
+					const qrStartY = height - 160;
+					const qrEndY = qrStartY + 128;
+					
+					// 如果当前行在二维码区域范围内
+					if (y >= qrStartY - CONFIG.TEXT.LINE_HEIGHT/2 && y <= qrEndY + CONFIG.TEXT.LINE_HEIGHT/2) {
+						ctx.beginPath();
+						ctx.moveTo(CONFIG.CANVAS.PADDING.HORIZONTAL, y);
+						ctx.lineTo(CONFIG.CANVAS.WIDTH - 180, y);
+						ctx.stroke();
+					} else {
+						ctx.beginPath();
+						ctx.moveTo(CONFIG.CANVAS.PADDING.HORIZONTAL, y);
+						ctx.lineTo(CONFIG.CANVAS.WIDTH - CONFIG.CANVAS.PADDING.HORIZONTAL, y);
+						ctx.stroke();
+					}
+				}
+				
+				// 绘制左边线
+				ctx.strokeStyle = CONFIG.COLORS.LINE;
+				ctx.lineWidth = 2;
+				ctx.beginPath();
+				ctx.moveTo(60, CONFIG.CANVAS.PADDING.VERTICAL);
+				ctx.lineTo(60, height - CONFIG.CANVAS.PADDING.VERTICAL);
+				ctx.stroke();
+				
+				ctx.restore();
+				
+				// 绘制文本
+				ctx.fillStyle = CONFIG.TEXT.COLOR;
+				ctx.textBaseline = 'alphabetic';
+				lines.forEach((line, index) => {
+					const y = CONFIG.TEXT.START_Y + (index * CONFIG.TEXT.LINE_HEIGHT) + CONFIG.TEXT.OFFSET_Y;
+					ctx.fillText(line, 90, y);
 				});
-			});
+				
+				// 创建临时的二维码
+				const tempQrDiv = document.createElement('div');
+				const tempQr = new QRCode(tempQrDiv, {
+					text: currentUrl,
+					width: 128,
+					height: 128,
+					colorDark : "#555555",
+					colorLight : CONFIG.COLORS.NOTE_BG,
+					correctLevel : QRCode.CorrectLevel.H
+				});
+				
+				// 等待临时二维码生成完成
+				setTimeout(() => {
+					const tempQrImage = tempQrDiv.querySelector('img');
+					// 绘制二维码
+					const qrX = CONFIG.CANVAS.WIDTH - 168;
+					const qrY = height - 160;
+					
+					// 绘制二维码背景
+					ctx.save();
+					ctx.beginPath();
+					ctx.roundRect(qrX - 5, qrY - 5, 138, 138, 10);
+					ctx.fillStyle = CONFIG.COLORS.NOTE_BG;
+					ctx.fill();
+					
+					ctx.drawImage(tempQrImage, qrX, qrY, 128, 128);
+					
+					// 清理临时元素
+					tempQrDiv.remove();
+					
+					// 生成图片数据
+					const dataUrl = canvas.toDataURL('image/png');
+					
+					// 根据屏幕宽度决定预览方式
+					if (Utils.isPC()) {
+						$('#previewNoteImage').attr('src', dataUrl);
+					} else {
+						$('#previewImage').attr('src', dataUrl);
+					}
+				}, 100);
+			}
 
+			// 绑定事件
+			function bindEvents() {
+				$('#saveButton').on('click', EventHandlers.onSave);
+				$('#copyButton').on('click', EventHandlers.onCopy);
+				$('#shareButton').on('click', EventHandlers.onShare);
+				$('#previewModal').off('wheel').on('wheel', EventHandlers.onPreviewWheel);
+				
+				// 文本输入防抖
+				let debounceTimer;
+				$('#textInput').on('input', function() {
+					clearTimeout(debounceTimer);
+					debounceTimer = setTimeout(() => {
+						if (Utils.isPC()) {
+							generateNoteImage();
+						}
+					}, 300);
+				});
 
-      $('#copyButton').on('click', function() {
-          var text = $('#textInput').val();
-          // console.log(text);
-          // 复制到剪贴板
-          navigator.clipboard.writeText(text).then(() => {
-              console.log("文本已复制到剪切板");
-          }).catch(err => {
-              console.error("复制失败:", err);
-          });
-          alert('Copied')
-      });
+				// 窗口大小变化防抖
+				let resizeTimer;
+				$(window).on('resize', function() {
+					clearTimeout(resizeTimer);
+					resizeTimer = setTimeout(() => {
+						if (Utils.isPC()) {
+							$('.preview-section').show();
+							generateNoteImage();
+						} else {
+							$('.preview-section').hide();
+							$('#previewModal').fadeOut();
+						}
+					}, 250);
+				});
+			}
+
+			// 初始化
+			function init() {
+				bindEvents();
+				if (Utils.isPC()) {
+					generateNoteImage();
+				} else {
+					$('.preview-section').hide();
+				}
+			}
+
+			// 启动应用
+			init();
 		});
 	</script>
 	 <script>
@@ -96,8 +659,11 @@
         // 创建二维码并显示在页面
         const qrcode = new QRCode(document.getElementById("qrcode"), {
             text: currentUrl,
-            width: 128, // 二维码宽度
-            height: 128 // 二维码高度
+            width: 128,
+            height: 128,
+            colorDark : "#000000",     // 页面上使用黑色
+            colorLight : "#ffffff",    // 页面上使用白色
+            correctLevel : QRCode.CorrectLevel.H
         });
     </script>
 </body>

@@ -113,6 +113,8 @@ jobs:
         mkdir -p $HOME/.kube
         echo "${{ secrets.KUBE_CONFIG_DATA }}" > $HOME/.kube/config
         chmod 600 $HOME/.kube/config
+        # 添加全局配置以忽略 SSL 验证
+        kubectl config set-cluster $(kubectl config current-context) --insecure-skip-tls-verify=true
 
     - name: Apply Kubernetes manifest
       run: |

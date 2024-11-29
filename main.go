@@ -71,6 +71,23 @@ func main() {
 		c.Redirect(http.StatusFound, "/"+address)
 	})
 
+	// 添加销毁笔记的路由
+	r.POST("/destroy/:address", func(c *gin.Context) {
+		address := c.Param("address")
+
+		// 从数据库中删除笔记
+		if err := dbWrapper.Delete(address); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to destroy note",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Note destroyed successfully",
+		})
+	})
+
 	r.Run()
 }
 

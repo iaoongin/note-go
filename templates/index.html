@@ -52,6 +52,7 @@
 		#copyButton { background-color: #3498db; }
 		#resetButton { background-color: #e74c3c; }
 		#shareButton { background-color: #9b59b6; }
+		#destroyButton { background-color: #e74c3c; }
 
 		button:hover {
 			opacity: 0.9;
@@ -336,6 +337,7 @@
 			<button id="saveButton">Save</button>
 			<button id="copyButton">Copy</button>
 			<button id="shareButton">Share as Image</button>
+			<button id="destroyButton">Destroy</button>
 		</div>
 		
 		<div class="preview-section" id="pcPreview">
@@ -476,6 +478,27 @@
 						PreviewState.scale = Math.max(PreviewState.scale - CONFIG.PREVIEW.SCALE_STEP, CONFIG.PREVIEW.MIN_SCALE);
 					}
 					$('#previewImage').css('transform', `scale(${PreviewState.scale})`);
+				},
+
+				// 销毁按钮点击事件
+				onDestroy() {
+					if (confirm('确定要销毁这个笔记吗？此操作不可撤销。')) {
+						$.ajax({
+							url: '/destroy/{{.RandomAddress}}',
+							method: 'POST',
+							success: function() {
+								$('#textInput').val('');  // 清空文本内容
+								if (Utils.isPC()) {
+									generateNoteImage();  // 更新预览区域
+								}
+								alert('笔记已销毁');
+								window.location.reload();  // 重定向到新笔记
+							},
+							error: function() {
+								alert('销毁失败，请稍后重试');
+							}
+						});
+					}
 				}
 			};
 
@@ -554,7 +577,7 @@
 				
 				ctx.restore();
 				
-				// 绘制文本
+				// 制文本
 				ctx.fillStyle = CONFIG.TEXT.COLOR;
 				ctx.textBaseline = 'alphabetic';
 				lines.forEach((line, index) => {
@@ -610,6 +633,7 @@
 				$('#copyButton').on('click', EventHandlers.onCopy);
 				$('#shareButton').on('click', EventHandlers.onShare);
 				$('#previewModal').off('wheel').on('wheel', EventHandlers.onPreviewWheel);
+				$('#destroyButton').on('click', EventHandlers.onDestroy);
 				
 				// 文本输入防抖
 				let debounceTimer;
@@ -635,6 +659,14 @@
 							$('#previewModal').fadeOut();
 						}
 					}, 250);
+				});
+
+				// 修改模态框点击事件，区分点击遮罩层和图片
+				$('#previewModal').on('click', function(e) {
+					// 只有当点击的是遮罩层本身时才关闭预览
+					if (e.target === this) {
+						PreviewState.reset();
+					}
 				});
 			}
 

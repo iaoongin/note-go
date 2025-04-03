@@ -96,7 +96,7 @@ func generateRandomAddress() string {
 	rand.Seed(time.Now().UnixNano())
 	// 生成8位随机字母数字字符串
 	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	randomAddress := make([]byte, 8)
+	randomAddress := make([]byte, 4)
 	for i := range randomAddress {
 		randomAddress[i] = chars[rand.Intn(len(chars))]
 	}
